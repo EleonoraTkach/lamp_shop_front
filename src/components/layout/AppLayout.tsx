@@ -8,16 +8,20 @@ export const AppLayout = () => {
 
   return (
     <div className="layout">
-      <aside className={`sidebar ${isOpen ? "open" : ""}`}>
+      <aside className={`sidebar ${isOpen ? "open" : "close"}`} >
         <Sidebar />
       </aside>
 
-      {isOpen && <div className="overlay" onClick={() => setIsOpen(false)} />}
+      {/* overlay всегда рендерится, но просто активируется */}
+      <div
+        className={`overlay ${isOpen ? "active" : ""}`}
+        onClick={() => setIsOpen(false)}
+      />
 
       <main className="chat">
         <button
           className="burger"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsOpen(prev => !prev)}
         >
           ☰
         </button>

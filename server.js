@@ -3,18 +3,26 @@ import fetch from "node-fetch";
 import cors from "cors";
 import { v4 as uuidv4 } from "uuid";
 import https from "https";
+import dotenv from "dotenv";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const AUTH_KEY = "MDE5ZDRmMGEtYzk2My03ZmJhLWExMzAtMGE4ZTVhNjY3MDYyOjkxNGE1NDhkLWFlNTUtNGQ0OS1iZTkzLTg3MjliODU1OGEzYg==";
+dotenv.config();
+
+const AUTH_KEY = process.env.AUTH_KEY;
+let accessToken = null;
+let tokenExpiresAt = 0; 
+
+if (!AUTH_KEY) {
+  throw new Error("AUTH_KEY не найден в .env");
+}
 
 const agent = new https.Agent({
   rejectUnauthorized: false,
 });
 
-let accessToken = null;
 
 async function getToken() {
   const response = await fetch(
@@ -33,16 +41,29 @@ async function getToken() {
   );
 
   const data = await response.json();
-  return data.access_token;
+
+  if (!data.access_token) {
+    throw new Error("Не удалось получить access_token");
+  }
+
+  accessToken = data.access_token;
+  tokenExpiresAt = Date.now() + (data.expires_in || 1800) * 1000;
+
+  return accessToken;
+}
+
+async function getValidToken() {
+  if (!accessToken || Date.now() > tokenExpiresAt) {
+    return await getToken();
+  }
+  return accessToken;
 }
 
 
 app.post("/chat", async (req, res) => {
   try {
-    if (!accessToken) {
-      accessToken = await getToken();
-    }
-
+	const token = await getValidToken();
+	
     const response = await fetch(
       "https://gigachat.devices.sberbank.ru/api/v1/chat/completions",
       {
@@ -50,7 +71,7 @@ app.post("/chat", async (req, res) => {
         agent,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           model: "GigaChat",
@@ -68,6 +89,10 @@ app.post("/chat", async (req, res) => {
     console.error(e);
     res.status(500).json({ error: "Ошибка сервера" });
   }
+});
+
+app.get("/", (req, res) => {
+  res.json({ status: "ok", message: "Сервер работает 🚀" });
 });
 
 app.listen(3001, () => {

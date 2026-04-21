@@ -79,7 +79,7 @@ export const ChatWindow = () => {
       });
     } catch (e: any) {
       if (e.name === "AbortError") {
-        console.log("⛔ Запрос остановлен");
+        console.log("Запрос остановлен");
       } else {
         console.error(e);
       }
@@ -108,17 +108,16 @@ export const ChatWindow = () => {
   }
 
   return (
-    <div className="flex flex-col flex-1">
-      <div className="p-4 border-b flex justify-between">
+    <div className="chat">
+      <div className="titleChat">
         <h2>{activeChat.title}</h2>
       </div>
 
       <MessageList
         messages={activeChat.messages}
         isLoading={state.isLoading}
+		bottomRef={bottomRef}
       />
-
-      <div ref={bottomRef} />
 
       <InputArea
         onSend={sendMessage}

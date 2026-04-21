@@ -12,7 +12,6 @@
 }
 
 .message-bubble {
-  text-align: left;
   max-width: 70%;
   padding: 10px 14px;
   border-radius: 16px;

@@ -19,7 +19,6 @@ export const ChatWindow = () => {
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  // 🚀 отправка сообщения
   const sendMessage = async (text: string) => {
     if (!text.trim() || !state.activeChatId) return;
 
@@ -41,13 +40,13 @@ export const ChatWindow = () => {
     dispatch({ type: "SET_LOADING", payload: true });
 
     try {
-      // 👉 берём всю историю
+
       const currentMessages = [
         ...(activeChat?.messages || []),
         userMessage,
       ];
 
-      // 👉 создаём контроллер для STOP
+
       const controller = new AbortController();
       abortRef.current = controller;
 
@@ -63,6 +62,7 @@ export const ChatWindow = () => {
       });
 
       const data = await response.json();
+	  console.log(data)
 
       const assistantMessage = {
         id: Date.now() + 1,
@@ -89,7 +89,7 @@ export const ChatWindow = () => {
     }
   };
 
-  // ⛔ стоп генерации
+
   const handleStop = () => {
     if (abortRef.current) {
       abortRef.current.abort();
@@ -99,7 +99,7 @@ export const ChatWindow = () => {
     dispatch({ type: "SET_LOADING", payload: false });
   };
 
-  // 📍 автоскролл
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeChat?.messages]);
@@ -109,17 +109,16 @@ export const ChatWindow = () => {
   }
 
   return (
-    <div className="flex flex-col flex-1">
-      <div className="p-4 border-b flex justify-between">
+    <div className="chat">
+      <div className="titleChat">
         <h2>{activeChat.title}</h2>
       </div>
 
       <MessageList
         messages={activeChat.messages}
         isLoading={state.isLoading}
+		bottomRef={bottomRef}
       />
-
-      <div ref={bottomRef} />
 
       <InputArea
         onSend={sendMessage}

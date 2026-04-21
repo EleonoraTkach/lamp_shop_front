@@ -1,34 +1,62 @@
 .layout {
   display: flex;
-  height: 100vh;
+  height: 100dvh;
   background: var(--color-bg);
-  gap: 8px;
-  padding: 8px;
+  overflow: hidden;
+  padding: 0px;
+  gap: 10px;
 }
 
 .sidebar {
   width: 260px;
+  height: 100%;
+
   background: var(--color-secondary);
   border-right: 1px solid var(--color-border);
+
   transition: transform 0.3s ease;
   border-radius: 12px;
   overflow: hidden;
+
 }
 
 .chat {
   flex: 1;
   display: flex;
   flex-direction: column;
+
+  height: 100%;
+  min-width: 0;
+
   position: relative;
-  border-radius: 12px;
-  overflow: hidden;
   background: var(--color-bg);
+  gap: 12px;
+}
+
+.titleChat {
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 600;
+
+  border-bottom: 1px solid var(--color-border);
+
+  position: sticky;
+  top: 0;
+  background: var(--color-bg);
+
+  z-index: 10;
 }
 
 .burger {
   display: none;
-  padding: 10px;
-  font-size: 20px;
+
+  position: absolute;
+  top: 10px;
+  left: 10px;
+
+  z-index: 200;
+
+  font-size: 22px;
   background: none;
   border: none;
   cursor: pointer;
@@ -37,27 +65,46 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 10;
+
+  background: rgba(255, 255, 255, 255);
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition: opacity 0.2s ease;
+
+  z-index: 90;
+}
+
+.overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (min-width: 769px) {
+  .sidebar {
+    transform: translateX(0);
+  }
 }
 
 @media (max-width: 768px) {
-  .layout {
-    gap: 0;
-    padding: 0;
+	
+  .sidebar.open {
+	transform: translateX(0);
   }
-  
+  .sidebar.close {
+	transform: translateX(-100%);
+  }
   .sidebar {
     position: fixed;
     top: 0;
     left: 0;
-    height: 100%;
-    z-index: 20;
-    transform: translateX(-100%);
-  }
 
-  .sidebar.open {
-    transform: translateX(0);
+    width: 260px;
+    height: 100dvh;
+
+    background: var(--color-secondary);
+    z-index: 120;
   }
 
   .burger {

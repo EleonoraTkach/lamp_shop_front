@@ -1,4 +1,5 @@
-import { useState , useRef} from "react";
+import { useState } from "react";
+import "./AppLayout.css";
 
 interface InputAreaProps {
   onSend: (text: string) => void;
@@ -7,38 +8,44 @@ interface InputAreaProps {
 }
 
 export const InputArea = ({ onSend, onStop, isLoading }: InputAreaProps) => {
-  const [value, setValue] = useState("");
+    const [value, setValue] = useState("");
 
-  const handleSend = () => {
-    if (!value.trim()) return;
+    const handleSend = () => {
+      if (!value.trim()) return;
 
-    onSend(value);
-    setValue("");
-  };
+      onSend(value);
+      setValue("");
+    };
 
-  return (
-    <div className="p-3 border-t flex gap-2">
-      <textarea
-        className="flex-1 resize-none"
-        rows={1}
-        value={value}
-        disabled={isLoading}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
-          }
-        }}
-      />
+	return (
+	  <div className="inputArea">
+		<textarea
+		  className="inputTextarea"
+		  rows={1}
+		  value={value}
+		  disabled={isLoading}
+		  onChange={(e) => setValue(e.target.value)}
+		  onKeyDown={(e) => {
+			if (e.key === "Enter" && !e.shiftKey) {
+			  e.preventDefault();
+			  handleSend();
+			}
+		  }}
+		/>
 
-      {isLoading ? (
-        <button onClick={onStop}>Стоп</button>
-      ) : (
-        <button onClick={handleSend} disabled={!value.trim()}>
-          Отправить
-        </button>
-      )}
-    </div>
-  );
+		{isLoading ? (
+		  <button className="inputButton stop" onClick={onStop}>
+			Стоп
+		  </button>
+		) : (
+		  <button
+			className="inputButton"
+			onClick={handleSend}
+			disabled={!value.trim()}
+		  >
+			Отправить
+		  </button>
+		)}
+	  </div>
+	);
 };

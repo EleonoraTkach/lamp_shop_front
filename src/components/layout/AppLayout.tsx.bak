@@ -8,20 +8,20 @@ export const AppLayout = () => {
 
   return (
     <div className="layout">
-      {/* Sidebar */}
-      <aside className={`sidebar ${isOpen ? "open" : ""}`}>
+      <aside className={`sidebar ${isOpen ? "open" : ""}`} >
         <Sidebar />
       </aside>
 
-      {/* Overlay (для мобилки) */}
-      {isOpen && <div className="overlay" onClick={() => setIsOpen(false)} />}
+      {/* overlay всегда рендерится, но просто активируется */}
+      <div
+        className={`overlay ${isOpen ? "active" : ""}`}
+        onClick={() => setIsOpen(false)}
+      />
 
-      {/* Chat */}
       <main className="chat">
-        {/* Бургер */}
         <button
           className="burger"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsOpen(prev => !prev)}
         >
           ☰
         </button>
