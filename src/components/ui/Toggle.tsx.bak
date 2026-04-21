@@ -1,5 +1,0 @@
-const toggleTheme = () => {
-  const current = document.documentElement.dataset.theme;
-  document.documentElement.dataset.theme =
-    current === "dark" ? "light" : "dark";
-};
