@@ -1,16 +1,29 @@
-import { Routes, Route } from "react-router-dom";
-import { ChatProvider } from "./components/sidebar/ChatContext";
-import { AppLayout } from "./components/layout/AppLayout";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
 
-const App = () => {
+import Categories from "./pages/Categories";
+import Catalog from "./pages/Catalog";
+import Product from "./pages/Product";
+import Cart from "./pages/Cart";
+import TrackOrder from "./pages/TrackOrder";
+import Preorder from "./pages/Preorder";
+
+function App() {
   return (
-    <ChatProvider>
+    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<AppLayout />} />
-        <Route path="/chat/:id" element={<AppLayout />} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<Categories />} />
+          <Route path="/catalog" element={<Catalog />} />
+          <Route path="/catalog/:categoryId" element={<Catalog />} />
+          <Route path="/product/:id" element={<Product />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/track" element={<TrackOrder />} />
+		  <Route path="/preorder" element={<Preorder />} />
+        </Route>
       </Routes>
-    </ChatProvider>
+    </BrowserRouter>
   );
-};
+}
 
 export default App;

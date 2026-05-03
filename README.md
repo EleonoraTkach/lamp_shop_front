@@ -77,3 +77,4 @@ export default defineConfig([
   },
 ])
 ```
+"# lamp_shop_front" 

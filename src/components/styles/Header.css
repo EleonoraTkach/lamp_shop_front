@@ -1,0 +1,31 @@
+header {
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 1px solid #e6e6e6;
+  padding: 12px 0;
+}
+
+header nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto; 
+  padding: 0 20px;
+}
+
+header a {
+  flex: 1;                 
+  text-align: center;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  padding: 10px 0;
+  transition: 0.2s;
+}
+
+header a:hover {
+  color: #007bff;
+  background: #f5f7ff;
+  border-radius: 8px;
+}
