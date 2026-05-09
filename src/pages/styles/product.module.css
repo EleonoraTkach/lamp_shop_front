@@ -1,10 +1,10 @@
-.product-page {
+.productPage {
   max-width: 1000px;
   margin: 0 auto;
   padding: 30px;
 }
 
-.product-back {
+.productBack {
   display: inline-block;
   margin-bottom: 15px;
   color: #007bff;
@@ -12,11 +12,11 @@
   font-weight: 500;
 }
 
-.product-back:hover {
+.productBack:hover {
   text-decoration: underline;
 }
 
-.product-card-detail {
+.productCardDetail {
   background: #fff;
   padding: 25px;
   border-radius: 14px;
@@ -27,27 +27,27 @@
   margin-bottom: 20px;
 }
 
-.product-title {
+.productTitle {
   font-size: 22px;
   font-weight: 700;
 }
 
-.product-price {
+.productPrice {
   font-size: 18px;
   font-weight: bold;
 }
 
-.product-info {
+.productInfo {
   color: #555;
 }
 
-.product-actions {
+.productActions {
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
-.product-actions button {
+.productActions button {
   padding: 10px 14px;
   border: none;
   border-radius: 8px;
@@ -56,11 +56,11 @@
   cursor: pointer;
 }
 
-.product-actions button:hover {
+.productActions button:hover {
   background: #0056b3;
 }
 
-.reviews-box {
+.reviewsBox {
   background: #fff;
   padding: 15px;
   border-radius: 12px;
@@ -70,17 +70,17 @@
   margin-bottom: 20px;
 }
 
-.review-item {
+.reviewItem {
   margin-bottom: 10px;
 }
 
-.review-item hr {
+.reviewItem hr {
   border: none;
   border-top: 1px solid #eee;
   margin-top: 10px;
 }
 
-.review-form {
+.reviewForm {
   background: #fff;
   padding: 15px;
   border-radius: 12px;
@@ -90,15 +90,15 @@
   gap: 10px;
 }
 
-.review-form input,
-.review-form textarea,
-.review-form select {
+.reviewForm input,
+.reviewForm textarea,
+.reviewForm select {
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 6px;
 }
 
-.review-form button {
+.reviewForm button {
   padding: 10px;
   border: none;
   border-radius: 8px;
@@ -107,6 +107,25 @@
   cursor: pointer;
 }
 
-.review-form button:hover {
+.reviewForm button:hover {
   background: #218838;
+}
+
+.errorBox {
+  background: #ffe5e5;
+  border: 1px solid #ff4d4d;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.errorTitle {
+  color: #cc0000;
+  font-weight: bold;
+  margin: 0;
+}
+
+.errorMessage {
+  color: #990000;
+  margin: 4px 0 0 0;
 }

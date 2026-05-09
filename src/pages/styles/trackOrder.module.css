@@ -1,29 +1,29 @@
-.track-container {
+.trackContainer {
   max-width: 800px;
   margin: 0 auto;
   padding: 30px;
 }
 
-.track-title {
+.trackTitle {
   text-align: center;
   margin-bottom: 20px;
 }
 
-.track-search {
+.trackSearch {
   display: flex;
   gap: 10px;
   justify-content: center;
   margin-bottom: 20px;
 }
 
-.track-search input {
+.trackSearch input {
   padding: 10px;
   width: 250px;
   border: 1px solid #ddd;
   border-radius: 8px;
 }
 
-.track-search button {
+.trackSearch button {
   padding: 10px 14px;
   border: none;
   border-radius: 8px;
@@ -32,17 +32,17 @@
   cursor: pointer;
 }
 
-.track-search button:hover {
+.trackSearch button:hover {
   background: #0056b3;
 }
 
-.track-error {
+.trackError {
   text-align: center;
   color: red;
   margin-bottom: 15px;
 }
 
-.track-card {
+.trackCard {
   background: #fff;
   padding: 20px;
   border-radius: 14px;
@@ -50,25 +50,25 @@
   margin-top: 20px;
 }
 
-.track-card h2,
-.track-card h3 {
+.trackCard h2,
+.trackCard h3 {
   margin-bottom: 10px;
 }
 
-.track-info {
+.trackInfo {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-bottom: 15px;
 }
 
-.track-items {
+.trackItems {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.track-item {
+.trackItem {
   padding: 10px;
   border: 1px solid #eee;
   border-radius: 10px;

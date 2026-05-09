@@ -1,110 +1,234 @@
-import { useParams, Link } from "react-router-dom";
-import { products } from "../data/mockData";
-import { useState } from "react";
-import { useCart } from "../context/CartContext";
-import "./styles/Catalog.css"
+import { useEffect, useMemo, useState,} from "react";
+
+import { useParams, Link,} from "react-router-dom";
+
+import { useDispatch, useSelector, } from "react-redux";
+
+import { fetchProducts, } from "../store/actions/productActions";
+
+import { addToCart } from "../store/actions/cartActions";
+
+import styles from "./styles/catalog.module.css";
 
 export default function Catalog() {
-  const { addToCart } = useCart();
+  const dispatch = useDispatch();
+
   const { categoryId } = useParams();
 
-  const [search, setSearch] = useState("");
-  const [onlyAvailable, setOnlyAvailable] = useState(false);
-  const [sort, setSort] = useState("");
+  const [search, setSearch] =
+      useState("");
 
-  let filtered = products;
+  const [onlyAvailable, setOnlyAvailable] =
+      useState(false);
 
-  if (categoryId) {
-    filtered = filtered.filter(
-      p => p.category_id === Number(categoryId)
-    );
-  }
+  const [sort, setSort] =
+      useState("");
 
-  filtered = filtered.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase())
+  const {
+    products,
+    loading,
+    error,
+  } = useSelector(
+      (state) => state.products
   );
 
-  if (onlyAvailable) {
-    filtered = filtered.filter(p => p.quantity > 0);
-  }
+  useEffect(() => {
+    dispatch(
+        fetchProducts(categoryId)
+    );
+  }, [dispatch, categoryId]);
 
-  if (sort === "asc") {
-    filtered = [...filtered].sort((a, b) => a.price - b.price);
-  }
+  const filteredProducts = useMemo(() => {
+    let filtered = [...products];
 
-  if (sort === "desc") {
-    filtered = [...filtered].sort((a, b) => b.price - a.price);
-  }
+    filtered = filtered.filter((p) =>
+        p.name
+            .toLowerCase()
+            .includes(search.toLowerCase())
+    );
+
+    if (onlyAvailable) {
+      filtered = filtered.filter(
+          (p) => p.quantity > 0
+      );
+    }
+
+    if (sort === "asc") {
+      filtered.sort(
+          (a, b) => a.price - b.price
+      );
+    }
+
+    if (sort === "desc") {
+      filtered.sort(
+          (a, b) => b.price - a.price
+      );
+    }
+
+    return filtered;
+  }, [
+    products,
+    search,
+    onlyAvailable,
+    sort,
+  ]);
 
   return (
-    <div className="catalog-layout">
-
-      <div className="catalog-sidebar">
-
-        <input
-          type="text"
-          placeholder="Поиск..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        <label>
+      <div className={styles.catalogLayout}>
+        <div className={styles.catalogSidebar}>
           <input
-            type="checkbox"
-            checked={onlyAvailable}
-            onChange={() => setOnlyAvailable(!onlyAvailable)}
+              type="text"
+              placeholder="Поиск..."
+              value={search}
+              onChange={(e) =>
+                  setSearch(e.target.value)
+              }
           />
-          Только в наличии
-        </label>
 
-        <select value={sort} onChange={(e) => setSort(e.target.value)}>
-          <option value="">Сортировка</option>
-          <option value="asc">Цена: по возрастанию</option>
-          <option value="desc">Цена: по убыванию</option>
-        </select>
+          <label>
+            <input
+                type="checkbox"
+                checked={onlyAvailable}
+                onChange={() =>
+                    setOnlyAvailable(
+                        !onlyAvailable
+                    )
+                }
+            />
 
-      </div>
+            Только в наличии
+          </label>
 
-      <div className="catalog-main">
+          <select
+              value={sort}
+              onChange={(e) =>
+                  setSort(e.target.value)
+              }
+          >
+            <option value="">
+              Сортировка
+            </option>
 
-        <Link to="/" className="back-link">
-          ← Назад
-        </Link>
+            <option value="asc">
+              Цена: по возрастанию
+            </option>
 
-        <div className="products-grid">
+            <option value="desc">
+              Цена: по убыванию
+            </option>
+          </select>
+        </div>
 
-          {filtered.map(p => (
-            <div key={p.id} className="product-card">
+        <div className={styles.catalogMain}>
+          <Link
+              to="/"
+              className={styles.backLink}
+          >
+            ← Назад
+          </Link>
 
-              <div className="product-title">
-                {p.name}
+          {loading && (
+              <div className={styles.loading}>
+                Загрузка товаров...
               </div>
+          )}
 
-              <div className="product-price">
-                {p.price} ₽
+          {error && (
+              <div className={styles.errorBlock}>
+                <h2
+                    className={styles.errorTitle}
+                >
+                  Ошибка загрузки
+                </h2>
+
+                <p
+                    className={styles.errorText}
+                >
+                  {error}
+                </p>
               </div>
+          )}
 
-              <div className="product-actions">
+          {!loading && !error && (
+              <div
+                  className={styles.productsGrid}
+              >
+                {filteredProducts.length >
+                0 ? (
+                    filteredProducts.map((p) => (
+                        <div
+                            key={p.id}
+                            className={
+                              styles.productCard
+                            }
+                        >
+                          <div
+                              className={
+                                styles.productTitle
+                              }
+                          >
+                            {p.name}
+                          </div>
 
-                {p.quantity > 0 ? (
-                  <button onClick={() => addToCart(p, 1)}>
-                    В корзину
-                  </button>
+                          <div
+                              className={
+                                styles.productPrice
+                              }
+                          >
+                            {p.price} ₽
+                          </div>
+
+                          <div
+                              className={
+                                styles.productActions
+                              }
+                          >
+                            {p.quantity > 0 ? (
+                                <button
+                                    onClick={() =>
+                                        dispatch(
+                                            addToCart(
+                                                p,
+                                                1
+                                            )
+                                        )
+                                    }
+                                >
+                                  В корзину
+                                </button>
+                            ) : (
+                                <p
+                                    className={
+                                      styles.outOfStock
+                                    }
+                                >
+                                  Нет в наличии
+                                </p>
+                            )}
+                          </div>
+
+                          <Link
+                              to={`/product/${p.id}`}
+                              className={
+                                styles.detailsLink
+                              }
+                          >
+                            Подробнее
+                          </Link>
+                        </div>
+                    ))
                 ) : (
-                  <p style={{ color: "red" }}>Нет в наличии</p>
+                    <div
+                        className={
+                          styles.emptyProducts
+                        }
+                    >
+                      Товары не найдены
+                    </div>
                 )}
-
               </div>
-
-              <Link to={`/product/${p.id}`}>
-                Подробнее
-              </Link>
-
-            </div>
-          ))}
-
+          )}
         </div>
       </div>
-    </div>
   );
 }

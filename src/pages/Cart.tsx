@@ -1,94 +1,209 @@
-import { useCart } from "../context/CartContext";
 import { useState } from "react";
-import "./styles/Cart.css";
+import {
+  useDispatch,
+  useSelector,
+} from "react-redux";
+
+import {
+  removeFromCart,
+  updateQuantity,
+} from "../store/actions/cartActions";
+
+import {
+  createOrderWithItems,
+} from "../store/actions/orderActions";
+
+import styles from "./styles/cart.module.css";
 
 export default function Cart() {
-  const { cart, removeFromCart, updateQuantity, total } = useCart();
+  const dispatch = useDispatch();
+
+
+  const cart = useSelector(
+      (state) => state.cartState.cart
+  );
+
+  const {
+    loading,
+    error,
+  } = useSelector((state) => state.orders);
+
+  const total = cart.reduce(
+      (sum, item) =>
+          sum + item.price * item.quantity,
+      0
+  );
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderNumber, setOrderNumber] = useState("");
 
-  const handleOrder = () => {
-    if (!name || !phone) {
+  const handleOrder = async () => {
+    if (!name.trim() || !phone.trim()) {
       alert("Заполните ФИО и телефон");
       return;
     }
 
-    alert("Заказ оформлен!");
+    if (cart.length === 0) {
+      alert("Корзина пустая");
+      return;
+    }
+
+    const result = await dispatch(
+        createOrderWithItems(
+            name,
+            phone,
+            cart
+        )
+    );
+
+
+    if (result.success) {
+        setOrderSuccess(true);
+
+        setOrderNumber(result.data.order.order_number);
+
+        setName("");
+        setPhone("");
+    } else {
+      alert(result.error);
+    }
   };
 
   return (
-    <div className="cart-layout">
+      <div className={styles.cartLayout}>
+        <div className={styles.cartItems}>
+          <h2 className={styles.cartTitle}>
+            Корзина
+          </h2>
 
-      <div className="cart-items">
+          {cart.length === 0 && (
+              <p className={styles.cartEmpty}>
+                Корзина пуста
+              </p>
+          )}
 
-        <h2 className="cart-title">Корзина</h2>
+          {cart.map((item) => (
+              <div
+                  key={item.id}
+                  className={styles.cartItem}
+              >
+                <h4>{item.name}</h4>
 
-        {cart.length === 0 && (
-          <p className="cart-empty">Корзина пустая</p>
-        )}
+                <p>{item.price} ₽</p>
 
-        {cart.map(item => (
-          <div key={item.id} className="cart-item">
+                <div
+                    className={styles.cartControls}
+                >
+                  <button
+                      onClick={() =>
+                          dispatch(
+                              updateQuantity(
+                                  item.id,
+                                  item.quantity - 1
+                              )
+                          )
+                      }
+                  >
+                    -
+                  </button>
 
-            <h4>{item.name}</h4>
+                  <span>{item.quantity}</span>
 
-            <p>{item.price} ₽</p>
+                  <button
+                      onClick={() =>
+                          dispatch(
+                              updateQuantity(
+                                  item.id,
+                                  item.quantity + 1
+                              )
+                          )
+                      }
+                  >
+                    +
+                  </button>
+                </div>
 
-            <div className="cart-controls">
-
-              <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>
-                -
-              </button>
-
-              <span>{item.quantity}</span>
-
-              <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>
-                +
-              </button>
-
-            </div>
-			
-			<button
-                className="cart-remove"
-                onClick={() => removeFromCart(item.id)}
-            >
-                Удалить
-            </button>
-
-          </div>
-        ))}
-
-      </div>
-
-      <div className="cart-checkout">
-
-        <h2>Оформление</h2>
-
-        <div className="cart-total">
-          Итого: {total} ₽
+                <button
+                    className={styles.cartRemove}
+                    onClick={() =>
+                        dispatch(
+                            removeFromCart(item.id)
+                        )
+                    }
+                >
+                  Удалить
+                </button>
+              </div>
+          ))}
         </div>
 
-        <input
-          type="text"
-          placeholder="ФИО"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        <div className={styles.cartCheckout}>
+          <h2>Оформление</h2>
 
-        <input
-          type="text"
-          placeholder="Телефон"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
+          <div className={styles.cartTotal}>
+            Итого: {total} ₽
+          </div>
 
-        <button onClick={handleOrder}>
-          Оформить заказ
-        </button>
+          <input
+              type="text"
+              placeholder="ФИО"
+              value={name}
+              onChange={(e) =>
+                  setName(e.target.value)
+              }
+          />
 
+          <input
+              type="text"
+              placeholder="Телефон"
+              value={phone}
+              onChange={(e) =>
+                  setPhone(e.target.value)
+              }
+          />
+
+          {error && (
+              <div className={styles.errorBox}>
+                {typeof error === "string"
+                    ? error
+                    : error.detail || JSON.stringify(error)}
+              </div>
+          )}
+
+          <button
+              onClick={handleOrder}
+              disabled={
+                  loading || cart.length === 0
+              }
+          >
+            {loading
+                ? "Оформление..."
+                : "Оформить заказ"}
+          </button>
+
+          {orderSuccess && (
+              <div className={styles.successBox}>
+                <p>Заказ успешно оформлен</p>
+
+                <p>
+                  Номер заказа:{" "}
+                  <strong>{orderNumber}</strong>
+                </p>
+
+                <button
+                    onClick={() =>
+                        navigator.clipboard.writeText(
+                            orderNumber
+                        )
+                    }
+                >
+                  Скопировать номер
+                </button>
+              </div>
+          )}
+        </div>
       </div>
-
-    </div>
   );
 }

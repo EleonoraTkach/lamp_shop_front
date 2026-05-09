@@ -1,30 +1,77 @@
 import { Link } from "react-router-dom";
-import { categories } from "../data/mockData";
-import "./styles/Category.css";
+
+import { useEffect } from "react";
+
+import {
+  useDispatch,
+  useSelector,
+} from "react-redux";
+
+import { fetchCategories } from "../store/actions/categoryActions";
+
+import styles from "./styles/category.module.css";
 
 export default function Categories() {
+  const dispatch = useDispatch();
+
+  const {
+    categories,
+    loading,
+    error,
+  } = useSelector(
+      (state) => state.categories
+  );
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
   return (
-    <div className="categories-container">
-      
-      <h1 className="categories-title">Категории</h1>
+      <div
+          className={styles.categoriesContainer}
+      >
+        <h1 className={styles.categoriesTitle}>
+          Категории
+        </h1>
 
-      <div className="categories-grid">
+        {loading && (
+            <div className={styles.loading}>
+              Загрузка категорий...
+            </div>
+        )}
 
-        <Link to="/catalog" className="category-card">
-          Все товары
-        </Link>
+        {error && (
+            <div className={styles.errorBlock}>
+              <h2 className={styles.errorTitle}>
+                Ошибка загрузки
+              </h2>
 
-        {categories.map(cat => (
-          <Link
-            key={cat.id}
-            to={`/catalog/${cat.id}`}
-            className="category-card"
-          >
-            {cat.name}
-          </Link>
-        ))}
+              <p className={styles.errorText}>
+                {error}
+              </p>
+            </div>
+        )}
 
+        {!loading && !error && (
+            <div className={styles.categoriesGrid}>
+              <Link
+                  to="/catalog"
+                  className={styles.categoryCard}
+              >
+                Все товары
+              </Link>
+
+              {categories.map((cat) => (
+                  <Link
+                      key={cat.id}
+                      to={`/catalog/${cat.id}`}
+                      className={styles.categoryCard}
+                  >
+                    {cat.name}
+                  </Link>
+              ))}
+            </div>
+        )}
       </div>
-    </div>
   );
 }

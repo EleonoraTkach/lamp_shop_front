@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import "./styles/Preorder.css";
+import { request } from "../api/api";
+
+import styles from "./styles/preorder.module.css";
 
 export default function Preorder() {
   const [items, setItems] = useState(() => {
@@ -12,6 +14,9 @@ export default function Preorder() {
 
   const [url, setUrl] = useState("");
   const [count, setCount] = useState(1);
+  const [orderNumber, setOrderNumber] = useState(null);
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("preorder_items", JSON.stringify(items));
@@ -21,152 +26,196 @@ export default function Preorder() {
     if (!url.trim()) return;
 
     const newItem = {
-      id: Date.now(),
-      image_url: url,
-      quantity: count,
+      image_url: url.trim(),
+      quantity: Math.max(1, Number(count) || 1),
     };
 
-    setItems(prev => [...prev, newItem]);
+    setItems((prev) => [...prev, newItem]);
+
     setUrl("");
     setCount(1);
   };
 
-  const removeItem = (id) => {
-    setItems(prev => prev.filter(i => i.id !== id));
+  const removeItem = (index) => {
+    setItems((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const updateQty = (id, value) => {
-    setItems(prev =>
-      prev.map(i =>
-        i.id === id ? { ...i, quantity: Math.max(1, value) } : i
-      )
+  const updateQty = (index, value) => {
+    const qty = Math.max(1, Number(value) || 1);
+
+    setItems((prev) =>
+        prev.map((item, i) =>
+            i === index ? { ...item, quantity: qty } : item
+        )
     );
   };
 
-  const handleSubmit = () => {
-    if (!name || !phone || items.length === 0) {
+  const handleSubmit = async () => {
+    if (!name.trim() || !phone.trim() || items.length === 0) {
       alert("Заполните данные и добавьте товары");
       return;
     }
 
-    const preorder = {
-      user_full_name: name,
-      phone_number: phone,
-      items,
+    const payload = {
+      order: {
+        user_full_name: name,
+        phone_number: phone,
+        custom: true,
+      },
+      items: items.map((i) => ({
+        image_url: i.image_url,
+        quantity: i.quantity,
+      })),
     };
 
-    console.log(preorder);
+    try {
+      setLoading(true);
 
-    alert("Предзаказ оформлен!");
+      const response = await request(
+          "http://localhost:8001/orders/custom",
+          "POST",
+          payload
+      );
 
-    setItems([]);
-    setName("");
-    setPhone("");
+      alert("Предзаказ оформлен!");
+      setOrderNumber(response.order.order_number);
+
+      setItems([]);
+      setName("");
+      setPhone("");
+
+      localStorage.removeItem("preorder_items");
+    } catch (e) {
+      alert(e.message || "Ошибка оформления предзаказа");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="preorder-layout">
+      <div className={styles.preorderLayout}>
+        <div className={styles.preorderItems}>
+          <h2 className={styles.preorderTitle}>
+            Позиции предзаказа
+          </h2>
 
-      <div className="preorder-items">
+          <input
+              placeholder="URL изображения"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+          />
 
-        <h2 className="preorder-title">Позиции предзаказа</h2>
+          <input
+              type="number"
+              min="1"
+              value={count}
+              onChange={(e) => setCount(e.target.value)}
+          />
 
-        <input
-          placeholder="URL изображения"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-        />
+          <button
+              className={styles.preorderAdd}
+              onClick={addItem}
+          >
+            Добавить
+          </button>
 
-        <input
-          type="number"
-          min="1"
-          value={count}
-          onChange={(e) => setCount(Number(e.target.value))}
-        />
+          <hr />
 
-		<button className="preorder-add" onClick={addItem}>
-		  Добавить
-		</button>
+          {items.length === 0 && <p>Нет позиций</p>}
 
-        <hr />
+          {items.map((item, index) => (
+              <div
+                  key={index}
+                  className={styles.preorderItem}
+              >
+                <div className={styles.preorderControls}>
+                  <img
+                      src={item.image_url}
+                      className={styles.preorderImage}
+                      alt=""
+                      width="80"
+                  />
 
-        {items.length === 0 && <p>Нет позиций</p>}
+                  <a
+                      href={item.image_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={styles.preorderUrl}
+                  >
+                    {item.image_url}
+                  </a>
 
-        {items.map(item => (
-          <div key={item.id} className="preorder-item">
+                  <div className={styles.preorderQty}>
+                    <button
+                        onClick={() =>
+                            updateQty(index, item.quantity - 1)
+                        }
+                    >
+                      -
+                    </button>
 
-            <img
-              src={item.image_url}
-              alt=""
-              width="80"
-            />
+                    <span>{item.quantity}</span>
 
-			<div className="preorder-controls">
-			
-			  <img
-				  src={item.image_url}
-				  className="preorder-image"
-				  alt=""
-				  width="80"
-			  />
-			  <a href={item.image_url} target="_blank" className="preorder-url">
-				  {item.image_url}
-			  </a>
+                    <button
+                        onClick={() =>
+                            updateQty(index, item.quantity + 1)
+                        }
+                    >
+                      +
+                    </button>
+                  </div>
 
-			  <div className="preorder-qty">
+                  <button
+                      className={styles.preorderRemove}
+                      onClick={() => removeItem(index)}
+                  >
+                    Удалить
+                  </button>
+                </div>
+              </div>
+          ))}
+        </div>
 
-				<button onClick={() => updateQty(item.id, item.quantity - 1)}>
-				  -
-				</button>
+        <div className={styles.preorderClient}>
+          <h2 className={styles.preorderTitle}>
+            Данные клиента
+          </h2>
 
-				<span>{item.quantity}</span>
+          <input
+              placeholder="ФИО"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+          />
 
-				<button onClick={() => updateQty(item.id, item.quantity + 1)}>
-				  +
-				</button>
+          <input
+              placeholder="Телефон"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+          />
 
-			  </div>
+          <hr />
 
-			  <button
-				className="preorder-remove"
-				onClick={() => removeItem(item.id)}
-			  >
-				Удалить
-			  </button>
+          <p>Всего позиций: {items.length}</p>
 
-			</div>
+          <button
+              className={styles.preorderSubmit}
+              onClick={handleSubmit}
+              disabled={loading}
+          >
+            {loading ? "Отправка..." : "Оформить предзаказ"}
+          </button>
 
-          </div>
-        ))}
+          {orderNumber && (
+              <div className={styles.successBox}>
+                <p>Предзаказ успешно оформлен</p>
 
+                <p>
+                  Номер заказа:{" "}
+                  <strong>{orderNumber}</strong>
+                </p>
+              </div>
+          )}
+        </div>
       </div>
-
-      <div className="preorder-client">
-
-        <h2 className="preorder-title">Данные клиента</h2>
-
-        <input
-          placeholder="ФИО"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <input
-          placeholder="Телефон"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-
-        <hr />
-
-        <p>Всего позиций: {items.length}</p>
-
-		<button className="preorder-submit" onClick={handleSubmit}>
-		  Оформить предзаказ
-		</button>
-
-      </div>
-
-    </div>
   );
 }

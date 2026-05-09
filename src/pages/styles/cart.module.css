@@ -1,4 +1,4 @@
-.cart-layout {
+.cartLayout {
   display: flex;
   gap: 20px;
   padding: 30px;
@@ -6,19 +6,19 @@
   margin: 0 auto;
 }
 
-.cart-items {
+.cartItems {
   flex: 2;
 }
 
-.cart-title {
+.cartTitle {
   margin-bottom: 15px;
 }
 
-.cart-empty {
+.cartEmpty {
   color: #777;
 }
 
-.cart-item {
+.cartItem {
   background: #fff;
   padding: 15px;
   border-radius: 12px;
@@ -29,17 +29,17 @@
   gap: 10px;
 }
 
-.cart-item h4 {
+.cartItem h4 {
   margin: 0;
 }
 
-.cart-controls {
+.cartControls {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.cart-controls button {
+.cartControls button {
   width: 32px;
   height: 32px;
   border: none;
@@ -49,14 +49,14 @@
   cursor: pointer;
 }
 
-.cart-controls {
+.cartControls {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-.cart-remove {
+.cartRemove {
   background: #dc3545 !important;
   color: white;
   border: none;
@@ -68,11 +68,11 @@
   font-size: 13px;
 }
 
-.cart-remove:hover {
+.cartRemove:hover {
   background: #b02a37 !important;
 }
 
-.cart-checkout {
+.cartCheckout {
   flex: 1;
   background: #fff;
   padding: 20px;
@@ -84,18 +84,18 @@
   gap: 10px;
 }
 
-.cart-total {
+.cartTotal {
   font-size: 18px;
   font-weight: bold;
 }
 
-.cart-checkout input {
+.cartCheckout input {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 8px;
 }
 
-.cart-checkout button {
+.cartCheckout button {
   padding: 10px;
   border: none;
   border-radius: 8px;
@@ -104,6 +104,6 @@
   cursor: pointer;
 }
 
-.cart-checkout button:hover {
+.cartCheckout button:hover {
   background: #218838;
 }

@@ -1,128 +1,203 @@
 import { useParams } from "react-router-dom";
-import { products, reviews as initialReviews } from "../data/mockData";
-import { useState } from "react";
-import { useCart } from "../context/CartContext";
-import "./styles/Product.css"
+import { useEffect, useState } from "react";
+
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../store/actions/cartActions";
+
+import {
+    fetchReviews,
+    createReview,
+} from "../store/actions/reviewActions";
+
+import { fetchProductById } from "../store/actions/productActions";
+
+import styles from "./styles/product.module.css";
 
 export default function Product() {
-  const { id } = useParams();
-  const { addToCart } = useCart();
+    const dispatch = useDispatch();
+    const { id } = useParams();
 
-  const product = products.find(p => p.id === Number(id));
+    // PRODUCT STATE
+    const product = useSelector(
+        (state) => state.products.selectedProduct
+    );
 
-  const [reviews, setReviews] = useState(
-    initialReviews.filter(r => r.product_id === Number(id))
-  );
+    const productLoading = useSelector(
+        (state) => state.products.loading
+    );
 
-  const [score, setScore] = useState(5);
-  const [text, setText] = useState("");
+    const productError = useSelector(
+        (state) => state.products.error
+    );
 
-  if (!product) return <p>Товар не найден</p>;
+    // REVIEWS STATE
+    const reviews = useSelector(
+        (state) => state.reviews.reviews
+    );
 
-  const handleAddReview = () => {
-    if (!text.trim()) return;
+    const reviewsLoading = useSelector(
+        (state) => state.reviews.loading
+    );
 
-    const newReview = {
-      id: Date.now(),
-      product_id: product.id,
-      score,
-      description: text,
+    const reviewsError = useSelector(
+        (state) => state.reviews.error
+    );
+
+    // LOAD PRODUCT
+    useEffect(() => {
+        if (id) {
+            dispatch(fetchProductById(id));
+            dispatch(fetchReviews(id));
+        }
+    }, [id, dispatch]);
+
+    // FORM STATE
+    const [score, setScore] = useState(5);
+    const [text, setText] = useState("");
+    const [orderNumber, setOrderNumber] = useState("");
+
+    const handleAddReview = () => {
+        if (!text.trim() || !orderNumber.trim()) return;
+
+        dispatch(
+            createReview(id, {
+                order_number: orderNumber,
+                score,
+                description: text,
+            })
+        );
+
+        setText("");
+        setOrderNumber("");
+        setScore(5);
     };
 
-    setReviews(prev => [newReview, ...prev]);
-    setText("");
-    setScore(5);
-  };
+    const safeReviews = Array.isArray(reviews) ? reviews : [];
 
-  const avg =
-    reviews.reduce((sum, r) => sum + r.score, 0) / reviews.length || 0;
+    const avg = safeReviews.length
+        ? safeReviews.reduce(
+        (s, r) => s + Number(r.score || 0),
+        0
+    ) / safeReviews.length
+        : 0;
 
-  return (
-    <div className="product-page">
+    if (!product) return <p>Товар не найден</p>;
 
-      <a className="product-back" onClick={() => window.history.back()}>
-        ← Назад
-      </a>
 
-      <div className="product-card-detail">
+    return (
+        <div className={styles.productPage}>
+            <button
+                className={styles.productBack}
+                onClick={() => window.history.back()}
+            >
+                ← Назад
+            </button>
 
-        <div className="product-title">
-          {product.name}
+            {productLoading && (
+                <p>Загрузка товара...</p>
+            )}
+
+            {productError && (
+                <div className={styles.errorBox}>
+                    <p className={styles.errorTitle}>⚠ Ошибка товара</p>
+                    <p className={styles.errorMessage}>{productError}</p>
+                </div>
+            )}
+
+            {/* PRODUCT */}
+            <div className={styles.productCardDetail}>
+                <div className={styles.productTitle}>
+                    {product.name}
+                </div>
+
+                <div className={styles.productInfo}>
+                    {product.description}
+                </div>
+
+                <div className={styles.productPrice}>
+                    {product.price} ₽
+                </div>
+
+                <div className={styles.productInfo}>
+                    В наличии: {product.quantity}
+                </div>
+
+                <div className={styles.productActions}>
+                    <button
+                        onClick={() =>
+                            dispatch(addToCart(product, 1))
+                        }
+                        disabled={product.quantity === 0}
+                    >
+                        Добавить в корзину
+                    </button>
+                </div>
+            </div>
+
+            {/* REVIEWS */}
+            <h2>Рейтинг: {avg.toFixed(1)} ⭐</h2>
+
+            <h2>Отзывы</h2>
+
+            {reviewsLoading && <p>Загрузка отзывов...</p>}
+
+            {reviewsError && (
+                <div className={styles.errorBox}>
+                    <p>⚠ Ошибка отзывов</p>
+                    <p>{reviewsError}</p>
+                </div>
+            )}
+
+            <div className={styles.reviewsBox}>
+                {safeReviews.length === 0 && !reviewsLoading && (
+                    <p>Пока нет отзывов</p>
+                )}
+
+                {safeReviews.map((r) => (
+                    <div key={r.id} className={styles.reviewItem}>
+                        <p>{"⭐".repeat(r.score)}</p>
+                        <p>{r.description}</p>
+                        <hr />
+                    </div>
+                ))}
+            </div>
+
+            {/* FORM */}
+            <div className={styles.reviewForm}>
+                <input
+                    type="text"
+                    placeholder="Номер заказа"
+                    value={orderNumber}
+                    onChange={(e) =>
+                        setOrderNumber(e.target.value)
+                    }
+                />
+
+                <select
+                    value={score}
+                    onChange={(e) =>
+                        setScore(Number(e.target.value))
+                    }
+                >
+                    {[1, 2, 3, 4, 5].map((n) => (
+                        <option key={n} value={n}>
+                            {n}
+                        </option>
+                    ))}
+                </select>
+
+                <textarea
+                    placeholder="Ваш отзыв"
+                    value={text}
+                    onChange={(e) =>
+                        setText(e.target.value)
+                    }
+                />
+
+                <button onClick={handleAddReview}>
+                    Оставить отзыв
+                </button>
+            </div>
         </div>
-
-        <div className="product-info">
-          {product.description}
-        </div>
-
-        <div className="product-price">
-          {product.price} ₽
-        </div>
-
-        <div className="product-info">
-          В наличии: {product.quantity}
-        </div>
-
-        <div className="product-actions">
-
-          <button
-            onClick={() => addToCart(product, 1)}
-            disabled={product.quantity === 0}
-          >
-            Добавить в корзину
-          </button>
-
-        </div>
-
-      </div>
-
-      <h2>Рейтинг: {avg.toFixed(1)} ⭐</h2>
-
-      <h2>Отзывы</h2>
-
-      <div className="reviews-box">
-
-        {reviews.length === 0 && <p>Пока нет отзывов</p>}
-
-        {reviews.map(r => (
-          <div key={r.id} className="review-item">
-            <p>{"⭐".repeat(r.score)}</p>
-            <p>{r.description}</p>
-            <hr />
-          </div>
-        ))}
-
-      </div>
-
-      <div className="review-form">
-
-        <input
-          type="text"
-          placeholder="Номер заказа"
-        />
-
-        <select
-          value={score}
-          onChange={(e) => setScore(Number(e.target.value))}
-        >
-          {[1, 2, 3, 4, 5].map(n => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
-
-        <textarea
-          placeholder="Ваш отзыв"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-
-        <button onClick={handleAddReview}>
-          Оставить отзыв
-        </button>
-
-      </div>
-
-    </div>
-  );
+    );
 }
