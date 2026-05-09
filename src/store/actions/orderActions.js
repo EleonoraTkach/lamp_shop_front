@@ -16,8 +16,7 @@ export const createOrderWithItems =
                 const payload = {
                     order: {
                         user_full_name: name,
-                        phone_number: phone,
-                        preorder_id:0
+                        phone_number: phone
                     },
 
                     items: cart.map((item) => ({
@@ -27,7 +26,7 @@ export const createOrderWithItems =
                 };
 
                 const data = await request(
-                    "http://localhost:8001/orders/withItems",
+                    "http://localhost:8001/orders/regular",
                     "POST",
                     payload
                 );
