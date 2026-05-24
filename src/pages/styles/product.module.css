@@ -4,23 +4,27 @@
   padding: 30px;
 }
 
+/* BACK BUTTON */
 .productBack {
   display: inline-block;
   margin-bottom: 15px;
   color: #007bff;
-  text-decoration: none;
   font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .productBack:hover {
   text-decoration: underline;
 }
 
+/* PRODUCT CARD */
 .productCardDetail {
   background: #fff;
   padding: 25px;
   border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -41,9 +45,10 @@
   color: #555;
 }
 
+/* ACTIONS */
 .productActions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
 }
 
@@ -60,13 +65,28 @@
   background: #0056b3;
 }
 
+/* DELETE BUTTON */
+.deleteBtn {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #dc3545;
+  color: #fff;
+  cursor: pointer;
+}
+
+.deleteBtn:hover {
+  background: #b02a37;
+}
+
+/* REVIEWS */
 .reviewsBox {
   background: #fff;
   padding: 15px;
   border-radius: 12px;
   max-height: 250px;
   overflow-y: auto;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   margin-bottom: 20px;
 }
 
@@ -80,11 +100,12 @@
   margin-top: 10px;
 }
 
+/* FORM */
 .reviewForm {
   background: #fff;
   padding: 15px;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -111,6 +132,7 @@
   background: #218838;
 }
 
+/* ERROR */
 .errorBox {
   background: #ffe5e5;
   border: 1px solid #ff4d4d;

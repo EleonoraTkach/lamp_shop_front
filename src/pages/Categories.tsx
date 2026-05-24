@@ -7,7 +7,7 @@ import {
   useSelector,
 } from "react-redux";
 
-import { fetchCategories } from "../store/actions/categoryActions";
+import { loadCategories  } from "../store/actions/categoryActions";
 
 import styles from "./styles/category.module.css";
 
@@ -23,7 +23,7 @@ export default function Categories() {
   );
 
   useEffect(() => {
-    dispatch(fetchCategories());
+    dispatch(loadCategories ());
   }, [dispatch]);
 
   return (

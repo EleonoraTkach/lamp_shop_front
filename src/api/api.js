@@ -1,12 +1,17 @@
 export const request = async (
     url,
     method = "GET",
-    data = null
+    data = null,
+    isAdmin = false
 ) => {
+    const token = localStorage.getItem("access_token");
     const options = {
         method,
         headers: {
             "Content-Type": "application/json",
+            ...(token && {
+                Authorization: `Bearer ${token}`,
+            }),
         },
     };
 
@@ -22,6 +27,11 @@ export const request = async (
         result = await response.json();
     } catch {
         result = null;
+    }
+
+    if (response.status === 401) {
+        localStorage.removeItem("access_token");
+        window.location.href = "/admin/login";
     }
 
     if (!response.ok) {
@@ -40,7 +50,6 @@ export const request = async (
         else if (result?.detail) {
             message = JSON.stringify(result.detail);
         }
-
         throw new Error(message);
     }
 

@@ -77,3 +77,16 @@
   color: #7a0000;
   font-size: 16px;
 }
+
+.categoryBtn {
+  padding: 6px 10px;
+  border: none;
+  cursor: pointer;
+  background: #2d6cdf;
+  color: white;
+  border-radius: 6px;
+}
+
+.deleteBtn {
+  background: #e74c3c;
+}

@@ -5,11 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/actions/cartActions";
 
 import {
-    fetchReviews,
+    loadReviews,
     createReview,
 } from "../store/actions/reviewActions";
 
-import { fetchProductById } from "../store/actions/productActions";
+import { loadProductsById } from "../store/actions/productActions";
 
 import styles from "./styles/product.module.css";
 
@@ -46,8 +46,8 @@ export default function Product() {
     // LOAD PRODUCT
     useEffect(() => {
         if (id) {
-            dispatch(fetchProductById(id));
-            dispatch(fetchReviews(id));
+            dispatch(loadProductsById(id));
+            dispatch(loadReviews(id));
         }
     }, [id, dispatch]);
 

@@ -26,7 +26,7 @@ export default function Cart() {
   const {
     loading,
     error,
-  } = useSelector((state) => state.orders);
+  } = useSelector((state) => state.order);
 
   const total = cart.reduce(
       (sum, item) =>

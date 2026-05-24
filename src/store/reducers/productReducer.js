@@ -2,7 +2,6 @@ import {
     SET_PRODUCTS,
     PRODUCTS_LOADING,
     PRODUCTS_ERROR,
-    CHANGE_PRODUCT_QUANTITY,
     SET_PRODUCT,
     PRODUCT_LOADING,
     PRODUCT_ERROR,
@@ -40,21 +39,6 @@ export const productReducer = (
                 error: action.payload,
             };
 
-        case CHANGE_PRODUCT_QUANTITY:
-            return {
-                ...state,
-                products: state.products.map(
-                    (product) =>
-                        product.id ===
-                        action.payload.productId
-                            ? {
-                                ...product,
-                                quantity:
-                                action.payload.quantity,
-                            }
-                            : product
-                ),
-            };
         case PRODUCT_LOADING:
             return {
                 ...state,

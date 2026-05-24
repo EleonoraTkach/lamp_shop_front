@@ -4,7 +4,7 @@ import { useParams, Link,} from "react-router-dom";
 
 import { useDispatch, useSelector, } from "react-redux";
 
-import { fetchProducts, } from "../store/actions/productActions";
+import { loadProducts, } from "../store/actions/productActions";
 
 import { addToCart } from "../store/actions/cartActions";
 
@@ -34,7 +34,7 @@ export default function Catalog() {
 
   useEffect(() => {
     dispatch(
-        fetchProducts(categoryId)
+        loadProducts(categoryId)
     );
   }, [dispatch, categoryId]);
 

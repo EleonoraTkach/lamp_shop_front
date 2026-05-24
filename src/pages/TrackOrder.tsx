@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch  } from "react-redux";
 import { request } from "../api/api";
-import { fetchProducts } from "../store/actions/productActions";
+import { loadProducts } from "../store/actions/productActions";
 
 import styles from "./styles/trackOrder.module.css";
 
@@ -13,7 +13,7 @@ export default function TrackOrder() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
     useEffect(() => {
-        dispatch(fetchProducts());
+        dispatch(loadProducts());
         }, [dispatch]);
   const products = useSelector(
       (state) => state.products.products || []
@@ -37,11 +37,11 @@ export default function TrackOrder() {
       setOrder(null);
 
       const orderData = await request(
-          `http://localhost:8001/orders/track/${trimmed}`
+          `http://localhost:8001/orders/track/${trimmed}?delete_flg=False`
       );
 
       const itemsData = await request(
-          `http://localhost:8001/orders/${orderData.id}/items`
+          `http://localhost:8001/orders/${orderData.id}/items?delete_flg=False`
       );
 
       setOrder({
