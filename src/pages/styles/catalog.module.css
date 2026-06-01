@@ -46,6 +46,15 @@
   text-decoration: underline;
 }
 
+.categoryTitle {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+  text-align: center;
+}
+
 .productsGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

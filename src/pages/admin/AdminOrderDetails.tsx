@@ -2,201 +2,132 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-    loadOrderById,
-    updateOrderStatus,
-    updateItemQuantity,
-    deleteOrderItem,
-    deleteOrderById,
-    updateOrderInfo,
-} from "../../store/actions/orderDetailsActions";
+import { loadOrderById, deleteOrderById, updateOrderInfo } from "../../store/actions/orderDetailsActions";
 
 import styles from "../styles/orderDetails.module.css";
+
+import AdminOrderDetailsStatus from "./AdminOrderDetailsStatus";
+import AdminOrderDetailsItem from "./AdminOrderDetailsItem";
+
 
 export default function AdminOrderDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { order, items, loading, error } = useSelector(
-        (s) => s.orderDetails
-    );
-
-    const [localItems, setLocalItems] = useState([]);
+    const { order, items, loading, error } = useSelector((s) => s.orderDetails);
     const [orderLocal, setOrderLocal] = useState(null);
-
 
     useEffect(() => {
         dispatch(loadOrderById(id));
     }, [id]);
 
-
     useEffect(() => {
-        setLocalItems(items);
-    }, [items]);
-
-    useEffect(() => {
-        if (order) {
-            setOrderLocal(order);
-        }
+        if (order) setOrderLocal(order);
     }, [order]);
 
     if (loading || !orderLocal) return <p>Загрузка...</p>;
 
+    const handleSaveOrderInfo = () => {
+        const totalCostStr = String(orderLocal.total_cost).trim();
+        const fullNameStr = String(orderLocal.user_full_name).trim();
+        const phoneStr = String(orderLocal.phone_number).trim();
+        const parsedCost = Number(orderLocal.total_cost);
+
+        if (totalCostStr === "" || isNaN(parsedCost) || parsedCost < 0) {
+            alert("Сумма заказа не может быть пустой или отрицательной.");
+            setOrderLocal(order);
+            return;
+        }
+        if (!fullNameStr) {
+            alert("Поле ФИО не может быть пустым.");
+            setOrderLocal(order);
+            return;
+        }
+        if (!phoneStr) {
+            alert("Поле телефона не может быть пустым.");
+            setOrderLocal(order);
+            return;
+        }
+
+        dispatch(updateOrderInfo(id, parsedCost, fullNameStr, phoneStr));
+    };
+
     return (
         <div className={styles.page}>
-            <button onClick={() => navigate(-1)}>
+            {/* Добавлен класс .backButton */}
+            <button className={styles.backButton} onClick={() => navigate(-1)}>
                 ← Назад
             </button>
 
-            {error && (
-                <div className={styles.errorBox}>
-                    {error}
+            {error && <div className={styles.errorBox}>{error}</div>}
+
+            {/* Обернули всю основную информацию в красивую карточку .orderCard */}
+            <div className={styles.orderCard}>
+                <h1 className={styles.orderTitle}>Заказ #{order.id}</h1>
+                <p>Номер заказа: {order.order_number}</p>
+
+                <div>
+                    Статус: <span className={styles.status}>{order.status}</span>
                 </div>
-            )}
 
-            <h1>Заказ #{order.id}</h1>
+                <div className={styles.orderInfoRow}>
+                    <label>Сумма:</label>
+                    <div className={styles.priceWrapper}>
+                        <input
+                            className={styles.orderInput}
+                            type="number"
+                            value={orderLocal.total_cost}
+                            onChange={(e) => setOrderLocal({ ...orderLocal, total_cost: e.target.value === "" ? "" : Number(e.target.value) })}
+                        />
+                        <span>₽</span>
+                    </div>
+                </div>
 
-            <p>Номер заказа: {order.order_number}</p>
-            <p>Статус: {order.status}</p>
-            <div>
-                <label>Сумма:</label>
-                <input
-                    type="number"
-                    value={orderLocal.total_cost}
-                    onChange={(e) =>
-                        setOrderLocal({ ...orderLocal, total_cost: e.target.value })
-                    }
-                />
-                <span> ₽</span>
-            </div>
+                <div className={styles.orderInfoRow}>
+                    <label>ФИО клиента:</label>
+                    <input
+                        className={styles.orderInput}
+                        type="text"
+                        value={orderLocal.user_full_name}
+                        onChange={(e) => setOrderLocal({ ...orderLocal, user_full_name: e.target.value })}
+                    />
+                </div>
 
-            <div>
-                <label>ФИО:</label>
-                <input
-                    type="text"
-                    value={orderLocal.user_full_name}
-                    onChange={(e) =>
-                        setOrderLocal({ ...orderLocal, user_full_name: e.target.value })
-                    }
-                />
-            </div>
+                <div className={styles.orderInfoRow}>
+                    <label>Телефон:</label>
+                    <input
+                        className={styles.orderInput}
+                        type="text"
+                        value={orderLocal.phone_number}
+                        onChange={(e) => setOrderLocal({ ...orderLocal, phone_number: e.target.value })}
+                    />
+                </div>
 
-            <div>
-                <label>Телефон:</label>
-                <input
-                    type="text"
-                    value={orderLocal.phone_number}
-                    onChange={(e) =>
-                        setOrderLocal({ ...orderLocal, phone_number: e.target.value })
-                    }
-                />
-            </div>
-
-            <button onClick={()=>dispatch(updateOrderInfo(id, Number(orderLocal.total_cost),orderLocal.user_full_name,orderLocal.phone_number))}>
-                Сохранить изменения
-            </button>
-
-            <div className={styles.actions}>
-                {orderLocal.is_custom ? (
-                    <button onClick={() => dispatch(updateOrderStatus(id, "accepted"))}>
-                        Одобрен
-                    </button>
-                ):(
-                    <></>
-                )}
-                <button onClick={() => dispatch(updateOrderStatus(id, "in_progress"))}>
-                    В работу
-                </button>
-
-                <button onClick={() => dispatch(updateOrderStatus(id, "ready_for_pickup"))}>
-                    Готов к выдаче
-                </button>
-
-                <button onClick={() => dispatch(updateOrderStatus(id, "delivered"))}>
-                    Выдан
-                </button>
-
-                <button onClick={() => dispatch(updateOrderStatus(id, "canceled"))}>
-                    Отменить
+                {/* Добавлен стильный класс .mainSaveBtn */}
+                <button className={styles.mainSaveBtn} onClick={handleSaveOrderInfo}>
+                    Сохранить изменения
                 </button>
             </div>
 
-            <button
-                className={styles.deleteBtn}
-                onClick={() => dispatch(deleteOrderById(id, navigate))}
-            >
+            <AdminOrderDetailsStatus orderId={id} isCustom={orderLocal.is_custom} />
+
+            <button className={styles.deleteBtn} onClick={() => dispatch(deleteOrderById(id, navigate))}>
                 Удалить заказ
             </button>
 
-            <h2>Товары</h2>
-
-            {localItems.map((item) => (
-                <div key={item.id} className={styles.item}>
-
-                    {!orderLocal.is_custom ? (
-                        <div className={styles.itemInfo}>
-                            <div className={styles.itemTitle}>
-                                {item.product?.name || `Товар #${item.product_id}`}
-                            </div>
-
-                            <div>
-                                Цена: {item.product?.price || 0} ₽
-                            </div>
-                        </div>
-                    ) : (
-                        <div className={styles.itemInfo}>
-                            <div>
-                                Товар #{item.id}
-                            </div>
-
-                            <img
-                                src={item.image_url}
-                                alt={`Товар ${item.product_id}`}
-                                className={styles.customImage}
-                            />
-
-                            <div>
-                                Кол-во: {item.quantity}
-                            </div>
-                        </div>
-                    )}
-
-                    <div className={styles.itemActions}>
-                        <input
-                            type="number"
-                            min="1"
-                            value={item.quantity}
-                            onChange={(e) =>
-                                setLocalItems((prev) =>
-                                    prev.map((i) =>
-                                        i.id === item.id
-                                            ? { ...i, quantity: Number(e.target.value) }
-                                            : i
-                                    )
-                                )
-                            }
-                        />
-
-                        <button
-                            onClick={() =>
-                                dispatch(updateItemQuantity(order.id, item.id, item.quantity))
-                            }
-                        >
-                            Сохранить
-                        </button>
-
-                        <button
-                            className={styles.deleteBtn}
-                            onClick={() =>
-                                dispatch(deleteOrderItem(order.id,item.id))
-                            }
-                        >
-                            Удалить
-                        </button>
-                    </div>
-                </div>
-            ))}
+            <h2 className={styles.itemsTitle}>Товары в заказе</h2>
+            <div className={styles.itemsList}>
+                {items.map((item) => (
+                    <AdminOrderDetailsItem
+                        key={item.id}
+                        item={item}
+                        orderId={order.id}
+                        originalItems={items}
+                        isCustomOrder={orderLocal.is_custom}
+                    />
+                ))}
+            </div>
         </div>
     );
 }

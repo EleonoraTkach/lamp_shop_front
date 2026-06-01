@@ -8,12 +8,10 @@ import {
     deleteProduct,
 } from "../../store/actions/productActions";
 
-import {
-    loadReviews,
-    deleteReview,
-} from "../../store/actions/reviewActions";
+import { loadReviews } from "../../store/actions/reviewActions";
 
 import styles from "../styles/product.module.css";
+import AdminReviewItem from "./AdminReviewItem.tsx";
 
 export default function AdminProduct() {
     const { id } = useParams();
@@ -27,8 +25,9 @@ export default function AdminProduct() {
     const { reviews } = useSelector((s) => s.reviews);
 
     const [name, setName] = useState("");
-    const [price, setPrice] = useState(0);
-    const [quantity, setQuantity] = useState(0);
+    const [description, setDescription] = useState("");
+    const [price, setPrice] = useState("");
+    const [quantity, setQuantity] = useState("");
 
     useEffect(() => {
         if (!id) return;
@@ -40,10 +39,51 @@ export default function AdminProduct() {
     useEffect(() => {
         if (selectedProduct) {
             setName(selectedProduct.name);
+            setDescription(selectedProduct.description);
             setPrice(selectedProduct.price);
             setQuantity(selectedProduct.quantity);
         }
     }, [selectedProduct]);
+
+    const handleSave = () => {
+        const parsedPrice = Number(price);
+        const parsedQuantity = Number(quantity);
+
+        if (price === "" || parsedPrice <= 0) {
+            alert("Цена товара должна быть больше 0. Изменения не сохранены.");
+            setPrice(selectedProduct ? selectedProduct.price : 0);
+            setQuantity(selectedProduct ? selectedProduct.quantity : 0);
+            return;
+        }
+
+        if (quantity === "" || parsedQuantity < 0) {
+            alert("Количество товара не может быть отрицательным или пустым. Изменения не сохранены.");
+            setPrice(selectedProduct ? selectedProduct.price : 0);
+            setQuantity(selectedProduct ? selectedProduct.quantity : 0);
+            return;
+        }
+
+        if (!name.trim()) {
+            alert("Название товара не может быть пустым. Изменения не сохранены.");
+            setName(selectedProduct ? selectedProduct.name : "");
+            return;
+        }
+
+        if (!description.trim()) {
+            alert("Описание товара не может быть пустым. Изменения не сохранены.");
+            setName(selectedProduct ? selectedProduct.description : "");
+            return;
+        }
+
+        dispatch(
+            updateProduct(id, {
+                name,
+                description,
+                price: parsedPrice,
+                quantity: parsedQuantity,
+            })
+        );
+    };
 
     if (loading || !selectedProduct) {
         return <p>Загрузка...</p>;
@@ -64,55 +104,50 @@ export default function AdminProduct() {
                 </h2>
 
                 <input
+                    className={styles.productInput}
                     value={name}
-                    onChange={(e) =>
-                        setName(e.target.value)
-                    }
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Название товара"
+                />
+
+                <textarea
+                    className={styles.productInput}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Описание товара"
                 />
 
                 <input
+                    className={styles.productInput}
                     type="number"
                     value={price}
                     onChange={(e) =>
-                        setPrice(Number(e.target.value))
+                        setPrice(e.target.value === "" ? "" : Number(e.target.value))
                     }
+                    placeholder="Цена"
                 />
 
                 <input
+                    className={styles.productInput}
                     type="number"
                     value={quantity}
                     onChange={(e) =>
-                        setQuantity(
-                            Number(e.target.value)
-                        )
+                        setQuantity(e.target.value === "" ? "" : Number(e.target.value))
                     }
+                    placeholder="Количество"
                 />
 
                 <div className={styles.productActions}>
-                    <button
-                        onClick={() =>
-                            dispatch(
-                                updateProduct(id, {
-                                    name,
-                                    price,
-                                    quantity,
-                                })
-                            )
-                        }
-                    >
+                    <button onClick={handleSave}>
                         Сохранить
                     </button>
 
                     <button
                         className={styles.deleteBtn}
-                        onClick={() =>
-                            dispatch(
-                                deleteProduct(
-                                    id,
-                                    navigate
-                                )
-                            )
-                        }
+                        onClick={() =>{
+                            dispatch(deleteProduct(id));
+                            navigate(-1);
+                        }}
                     >
                         Удалить товар
                     </button>
@@ -122,31 +157,14 @@ export default function AdminProduct() {
             <h2>Отзывы</h2>
 
             <div className={styles.reviewsBox}>
-                {reviews?.length === 0 && (
-                    <p>Нет отзывов</p>
-                )}
+                {reviews?.length === 0 && <p>Нет отзывов</p>}
 
                 {reviews?.map((r) => (
-                    <div
+                    <AdminReviewItem
                         key={r.id}
-                        className={styles.reviewItem}
-                    >
-                        <p>{"⭐".repeat(r.score)}</p>
-                        <p>{r.description}</p>
-
-                        <button
-                            className={styles.deleteBtn}
-                            onClick={() =>
-                                dispatch(
-                                    deleteReview(id, r.id)
-                                )
-                            }
-                        >
-                            Удалить отзыв
-                        </button>
-
-                        <hr />
-                    </div>
+                        review={r}
+                        productId={id}
+                    />
                 ))}
             </div>
         </div>

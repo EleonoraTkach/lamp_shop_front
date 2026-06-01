@@ -23,13 +23,28 @@ export default function AdminCategories() {
         dispatch(loadCategories());
     }, [dispatch]);
 
-    const openCategory = (id: string | number) => {
-        navigate(`/admin/catalog/${id}`);
+    const openCategory = (id: string | number, name: string) => {
+        navigate(`/admin/catalog/${id}`, { state: { categoryName: name } });
     };
 
     return (
         <div className={styles.categoriesContainer}>
             <h1>Категории</h1>
+
+            <button
+                className={styles.categoryCard}
+                onClick={() => {
+                    const name = prompt(
+                        "Введите название категории"
+                    );
+
+                    if (name?.trim()) {
+                        dispatch(addCategory(name));
+                    }
+                }}
+            >
+                + Добавить категорию
+            </button>
 
             {loading && <div>Загрузка...</div>}
 
@@ -45,25 +60,11 @@ export default function AdminCategories() {
                 </div>
             )}
             {!loading && !error && (
-                <>
-                <button
-                    className={styles.categoryCard}
-                    onClick={() => {
-                        const name = prompt(
-                            "Введите название категории"
-                        );
 
-                        if (name?.trim()) {
-                            dispatch(addCategory(name));
-                        }
-                    }}
-                >
-                    + Добавить категорию
-                </button>
                 <div className={styles.categoriesGrid}>
                     <div
                         className={styles.categoryCard}
-                        onClick={() => openCategory("all")}
+                        onClick={() => openCategory("all","Все категории")}
                     >
                         {ALL_CATEGORIES.name}
                     </div>
@@ -71,7 +72,7 @@ export default function AdminCategories() {
                     {categories.map((cat) => (
                         <div
                             key={cat.id}
-                            onClick={() => openCategory(cat.id)}
+                            onClick={() => openCategory(cat.id, cat.name)}
                         >
                             <AdminCategoryItem
                                 category={cat}
@@ -85,7 +86,6 @@ export default function AdminCategories() {
                         </div>
                     ))}
                 </div>
-                </>
             )}
 
         </div>

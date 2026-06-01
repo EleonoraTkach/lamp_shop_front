@@ -1,18 +1,9 @@
 import { useState } from "react";
-import {
-  useDispatch,
-  useSelector,
-} from "react-redux";
+import {useDispatch, useSelector,} from "react-redux";
+import { Link } from "react-router-dom";
 
-import {
-  removeFromCart,
-  updateQuantity,
-} from "../store/actions/cartActions";
-
-import {
-  createOrderWithItems,
-} from "../store/actions/orderActions";
-
+import {removeFromCart, updateQuantity,} from "../store/actions/cartActions";
+import {createOrderWithItems,} from "../store/actions/orderActions";
 import styles from "./styles/cart.module.css";
 
 export default function Cart() {
@@ -50,13 +41,7 @@ export default function Cart() {
       return;
     }
 
-    const result = await dispatch(
-        createOrderWithItems(
-            name,
-            phone,
-            cart
-        )
-    );
+    const result = await dispatch(createOrderWithItems(name, phone, cart));
 
 
     if (result.success) {
@@ -89,20 +74,17 @@ export default function Cart() {
                   key={item.id}
                   className={styles.cartItem}
               >
-                <h4>{item.name}</h4>
+                <Link to={`/product/${item.id}`} className={styles.cartItemLink}>
+                  <h4>{item.name}</h4>
+                </Link>
 
                 <p>{item.price} ₽</p>
 
-                <div
-                    className={styles.cartControls}
-                >
+                <div className={styles.cartControls}>
                   <button
                       onClick={() =>
                           dispatch(
-                              updateQuantity(
-                                  item.id,
-                                  item.quantity - 1
-                              )
+                              updateQuantity(item.id, item.quantity - 1)
                           )
                       }
                   >
@@ -113,12 +95,7 @@ export default function Cart() {
 
                   <button
                       onClick={() =>
-                          dispatch(
-                              updateQuantity(
-                                  item.id,
-                                  item.quantity + 1
-                              )
-                          )
+                          dispatch(updateQuantity(item.id, item.quantity + 1))
                       }
                   >
                     +
@@ -127,11 +104,7 @@ export default function Cart() {
 
                 <button
                     className={styles.cartRemove}
-                    onClick={() =>
-                        dispatch(
-                            removeFromCart(item.id)
-                        )
-                    }
+                    onClick={() => dispatch(removeFromCart(item.id))}
                 >
                   Удалить
                 </button>
@@ -166,38 +139,27 @@ export default function Cart() {
 
           {error && (
               <div className={styles.errorBox}>
-                {typeof error === "string"
-                    ? error
-                    : error.detail || JSON.stringify(error)}
+                {typeof error === "string" ? error : error.detail || JSON.stringify(error)}
               </div>
           )}
 
           <button
               onClick={handleOrder}
-              disabled={
-                  loading || cart.length === 0
-              }
+              disabled={loading || cart.length === 0}
           >
-            {loading
-                ? "Оформление..."
-                : "Оформить заказ"}
+            {loading ? "Оформление..." : "Оформить заказ"}
           </button>
 
           {orderSuccess && (
               <div className={styles.successBox}>
                 <p>Заказ успешно оформлен</p>
 
-                <p>
-                  Номер заказа:{" "}
+                <p> Номер заказа:{" "}
                   <strong>{orderNumber}</strong>
                 </p>
 
                 <button
-                    onClick={() =>
-                        navigator.clipboard.writeText(
-                            orderNumber
-                        )
-                    }
+                    onClick={() => navigator.clipboard.writeText(orderNumber)}
                 >
                   Скопировать номер
                 </button>

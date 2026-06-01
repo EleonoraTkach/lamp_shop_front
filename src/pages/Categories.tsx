@@ -1,24 +1,14 @@
 import { Link } from "react-router-dom";
-
 import { useEffect } from "react";
-
-import {
-  useDispatch,
-  useSelector,
-} from "react-redux";
+import {useDispatch, useSelector,} from "react-redux";
 
 import { loadCategories  } from "../store/actions/categoryActions";
-
 import styles from "./styles/category.module.css";
 
 export default function Categories() {
   const dispatch = useDispatch();
 
-  const {
-    categories,
-    loading,
-    error,
-  } = useSelector(
+  const {categories, loading, error,} = useSelector(
       (state) => state.categories
   );
 
@@ -27,9 +17,7 @@ export default function Categories() {
   }, [dispatch]);
 
   return (
-      <div
-          className={styles.categoriesContainer}
-      >
+      <div className={styles.categoriesContainer}>
         <h1 className={styles.categoriesTitle}>
           Категории
         </h1>
@@ -46,9 +34,7 @@ export default function Categories() {
                 Ошибка загрузки
               </h2>
 
-              <p className={styles.errorText}>
-                {error}
-              </p>
+              <p className={styles.errorText}>{error}</p>
             </div>
         )}
 
@@ -65,6 +51,7 @@ export default function Categories() {
                   <Link
                       key={cat.id}
                       to={`/catalog/${cat.id}`}
+                      state={{ categoryName: cat.name }}
                       className={styles.categoryCard}
                   >
                     {cat.name}

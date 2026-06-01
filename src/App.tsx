@@ -17,6 +17,7 @@ import Preorder from "./pages/Preorder";
 
 import Login from "./pages/admin/Login";
 import AdminCategories from "./pages/admin/AdminCategories";
+import AdminCreateProduct from "./pages/admin/AdminCreateProduct";
 
 import PrivateRoute from "./components/admin/PrivateRoute";
 import AdminCatalog from "./pages/admin/AdminCatalog.tsx";
@@ -56,6 +57,7 @@ function App() {
             <Route path="product/:id" element={<AdminProduct />} />
             <Route path="/admin/orders" element={<AdminOrders />} />
             <Route path="/admin/orders/:id" element={<AdminOrderDetails />} />
+            <Route path="/admin/createProduct/:categoryId" element={<AdminCreateProduct />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" />} />

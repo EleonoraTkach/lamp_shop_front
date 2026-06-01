@@ -67,7 +67,6 @@ export default function AdminOrders() {
                 Заказы
             </h1>
 
-            {/* SEARCH */}
             <input
                 type="text"
                 placeholder="Поиск по номеру заказа"
@@ -78,75 +77,48 @@ export default function AdminOrders() {
                 className={styles.searchInput}
             />
 
-            {/* STATUS FILTER */}
             <div className={styles.filters}>
                 {STATUS_FILTERS.map((s) => (
                     <button
                         key={s}
                         onClick={() => setStatus(s)}
-                        className={
-                            status === s
-                                ? styles.active
-                                : ""
-                        }
+                        className={status === s ? styles.active : ""}
                     >
                         {s}
                     </button>
                 ))}
             </div>
 
-            {/* TYPE FILTER */}
             <div className={styles.typeFilters}>
                 <button
-                    onClick={() =>
-                        setTypeFilter("all")
-                    }
-                    className={
-                        typeFilter === "all"
-                            ? styles.active
-                            : ""
-                    }
+                    onClick={() => setTypeFilter("all")}
+                    className={typeFilter === "all" ? styles.active : ""}
                 >
                     Все
                 </button>
 
                 <button
-                    onClick={() =>
-                        setTypeFilter("regular")
-                    }
-                    className={
-                        typeFilter === "regular"
-                            ? styles.active
-                            : ""
-                    }
+                    onClick={() => setTypeFilter("regular")}
+                    className={typeFilter === "regular" ? styles.active : ""}
                 >
                     Обычные
                 </button>
 
                 <button
-                    onClick={() =>
-                        setTypeFilter("custom")
-                    }
-                    className={
-                        typeFilter === "custom"
-                            ? styles.active
-                            : ""
-                    }
+                    onClick={() => setTypeFilter("custom")}
+                    className={typeFilter === "custom" ? styles.active : ""}
                 >
                     Кастомные
                 </button>
             </div>
 
-            {/* STATES */}
+
             {loading && <p>Загрузка...</p>}
 
             {error && (
-                <p style={{ color: "red" }}>
-                    {error}
-                </p>
+                <p style={{ color: "red" }}>{error}</p>
             )}
 
-            {/* LIST */}
             <div className={styles.list}>
                 {filteredOrders.map((order) => (
                     <div
@@ -159,11 +131,7 @@ export default function AdminOrders() {
                         }
                     >
                         <div className={styles.info}>
-                            <div
-                                className={
-                                    styles.orderId
-                                }
-                            >
+                            <div className={styles.orderId}>
                                 Заказ #{order.id}
                             </div>
 
@@ -179,16 +147,10 @@ export default function AdminOrders() {
                                         : styles.regularBadge
                                 }
                             >
-                                {order.is_custom
-                                    ? "Кастомный"
-                                    : "Обычный"}
+                                {order.is_custom ? "Кастомный" : "Обычный"}
                             </div>
 
-                            <div
-                                className={
-                                    styles.status
-                                }
-                            >
+                            <div className={styles.status}>
                                 Статус: {order.status}
                             </div>
                         </div>

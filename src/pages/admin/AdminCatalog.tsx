@@ -1,12 +1,8 @@
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, Link, useLocation  } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-    loadProducts,
-    deleteProduct,
-    addProduct
-} from "../../store/actions/productActions";
+import { loadProducts } from "../../store/actions/productActions";
 
 import {
     setSearch,
@@ -15,10 +11,13 @@ import {
 } from "../../store/actions/catalogActions";
 
 import styles from "../styles/catalog.module.css";
+import AdminCatalogItem from "./AdminCatalogItem.tsx";
 
 export default function AdminCatalog() {
     const { categoryId } = useParams();
-    const navigate = useNavigate();
+    const location = useLocation();
+    const categoryName = location.state?.categoryName;
+
     const dispatch = useDispatch();
 
     const { products, loading, error } = useSelector(
@@ -51,7 +50,7 @@ export default function AdminCatalog() {
 
     return (
         <div className={styles.catalogLayout}>
-            {/* SIDEBAR */}
+
             <div className={styles.catalogSidebar}>
                 <h3>Фильтры</h3>
 
@@ -97,9 +96,7 @@ export default function AdminCatalog() {
 
             <div className={styles.catalogMain}>
                 <h1>
-                    {categoryId === "all"
-                        ? "Все товары"
-                        : `Категория ${categoryId}`}
+                    {categoryName || (categoryId === "all" ? "Все товары" : `Категория ${categoryId}`)}
                 </h1>
 
                 {loading && <div>Загрузка...</div>}
@@ -118,71 +115,24 @@ export default function AdminCatalog() {
 
                 {!loading && !error && ( <>
                     {categoryId !== "all" && (
-                        <button
+                        <Link
+                            to={`/admin/createProduct/${categoryId}`}
                             className={styles.productCard}
-                            onClick={() => {
-                                const name = prompt("Введите название товара");
-                                if (!name?.trim()) return;
-
-                                const description = prompt("Введите описание товара");
-                                if (!description?.trim()) return;
-
-                                const quantityStr = prompt("Введите количество (>= 0)");
-                                const quantity = Number(quantityStr);
-
-                                if (Number.isNaN(quantity) || quantity < 0) {
-                                    alert("Некорректное количество");
-                                    return;
-                                }
-
-                                const priceStr = prompt("Введите цену (> 0)");
-                                const price = Number(priceStr);
-
-                                if (Number.isNaN(price) || price <= 0) {
-                                    alert("Некорректная цена");
-                                    return;
-                                }
-
-                                dispatch(
-                                    addProduct(categoryId, {
-                                        name: name.trim(),
-                                        description:description.trim(),
-                                        quantity,
-                                        price,
-                                    })
-                                );
-                            }}
                         >
                             + Добавить товар
-                        </button>
+                        </Link>
                     )}
                     <p>Найдено товаров:{" "}{filteredProducts.length}</p>
 
                     <div className={styles.productsGrid}>
                         {filteredProducts.map((p) => (
-                        <div key={p.id} className={styles.productCard}>
-                            <div className={styles.productTitle}>{p.name}</div>
-
-                            <div className={styles.productPrice}>{p.price} ₽</div>
-
-                            <div>{p.quantity > 0 ? `Количество: ${p.quantity}` : "Нет в наличии"}</div>
-
-                            <div className={styles.productActions}>
-                                <button onClick={() => navigate(`/admin/product/${p.id}`)}>
-                                    Подробнее
-                                </button>
-
-                                <button
-                                    onClick={() => dispatch(deleteProduct(p.id))}
-                                    className={styles.deleteBtn}
-                                >
-                                    Удалить
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                    </>)}
+                            <AdminCatalogItem
+                                key={p.id}
+                                product={p}
+                            />
+                        ))}
+                    </div>
+                </>)}
             </div>
         </div>
     );
