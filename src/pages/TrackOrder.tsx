@@ -65,7 +65,6 @@ export default function TrackOrder() {
           >
             <img
                 src={item.image_url}
-                alt="custom"
                 width={60}
                 height={60}
                 style={{

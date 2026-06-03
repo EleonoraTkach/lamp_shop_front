@@ -1,8 +1,8 @@
 import { request } from "../../api/api";
+import {SET_ORDERS} from "./ordersActions.js";
 
-export const ORDER_DETAILS_SUCCESS = "ORDER_DETAILS_SUCCESS";
+
 export const ORDER_DETAILS_LOADING = "ORDER_DETAILS_LOADING";
-export const ORDER_SUCCESS = "ORDER_SUCCESS";
 export const ORDER_ERROR = "ORDER_ERROR";
 
 export const SET_ORDER = "SET_ORDER";
@@ -113,13 +113,19 @@ export const deleteOrderItem = (orderId, itemId) => {
     };
 };
 
-export const deleteOrderById = (id, navigate) => {
-    return async () => {
+
+export const deleteOrderById = (id) => {
+    return async (dispatch, getState) => {
         await request(
             `http://localhost:8001/orders/${id}`,
             "DELETE"
         );
 
-        navigate(-1);
+        const { orders } = getState().orders;
+
+        dispatch({
+            type: SET_ORDERS,
+            payload: orders.filter((order) => order.id !== id),
+        });
     };
 };

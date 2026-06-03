@@ -55,14 +55,13 @@ export default function AdminOrderDetails() {
 
     return (
         <div className={styles.page}>
-            {/* Добавлен класс .backButton */}
+
             <button className={styles.backButton} onClick={() => navigate(-1)}>
                 ← Назад
             </button>
 
             {error && <div className={styles.errorBox}>{error}</div>}
 
-            {/* Обернули всю основную информацию в красивую карточку .orderCard */}
             <div className={styles.orderCard}>
                 <h1 className={styles.orderTitle}>Заказ #{order.id}</h1>
                 <p>Номер заказа: {order.order_number}</p>
@@ -77,6 +76,8 @@ export default function AdminOrderDetails() {
                         <input
                             className={styles.orderInput}
                             type="number"
+                            min="0"
+                            step="0.01"
                             value={orderLocal.total_cost}
                             onChange={(e) => setOrderLocal({ ...orderLocal, total_cost: e.target.value === "" ? "" : Number(e.target.value) })}
                         />
@@ -104,7 +105,6 @@ export default function AdminOrderDetails() {
                     />
                 </div>
 
-                {/* Добавлен стильный класс .mainSaveBtn */}
                 <button className={styles.mainSaveBtn} onClick={handleSaveOrderInfo}>
                     Сохранить изменения
                 </button>
@@ -112,7 +112,13 @@ export default function AdminOrderDetails() {
 
             <AdminOrderDetailsStatus orderId={id} isCustom={orderLocal.is_custom} />
 
-            <button className={styles.deleteBtn} onClick={() => dispatch(deleteOrderById(id, navigate))}>
+            <button
+                className={styles.deleteBtn}
+                onClick={async () => {
+                    await dispatch(deleteOrderById(id));
+                    navigate(-1);
+                }}
+            >
                 Удалить заказ
             </button>
 

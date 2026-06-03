@@ -31,27 +31,26 @@ export default function AdminOrderDetailsItem({ item, orderId, originalItems, is
                     <div className={styles.itemTitle}>
                         {item.product?.name || `Товар #${item.product_id}`}
                     </div>
-                    {/* Добавлен класс .itemPrice */}
+
                     <div className={styles.itemPrice}>Цена: {item.price || 0} ₽</div>
                 </div>
             ) : (
                 <div className={styles.itemInfo}>
                     <div>Товар #{item.id}</div>
-                    <img src={item.image_url} alt={`Товар ${item.product_id}`} className={styles.customImage} />
+                    <img src={item.image_url} className={styles.customImage} />
                     <div>Кол-во: {quantity}</div>
                 </div>
             )}
 
             <div className={styles.itemActions}>
                 <input
-                    // Добавлен класс .quantityInput вместо дефолтных стилей
                     className={styles.quantityInput}
                     type="number"
                     min="1"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value === "" ? "" : Number(e.target.value))}
                 />
-                {/* Добавлен класс .saveBtn */}
+
                 <button className={styles.saveBtn} onClick={handleSaveQuantity}>
                     Сохранить
                 </button>

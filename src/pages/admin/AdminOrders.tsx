@@ -23,17 +23,14 @@ export default function AdminOrders() {
         (s) => s.orders
     );
 
-    // filters (можно тоже в redux, но оставим локально)
     const [status, setStatus] = useState("all");
     const [typeFilter, setTypeFilter] = useState("all");
     const [search, setSearch] = useState("");
 
-    // LOAD
     useEffect(() => {
         dispatch(fetchOrders());
     }, []);
 
-    // FILTERS
     const filteredOrders = useMemo(() => {
         return orders.filter((order) => {
             const statusMatch =
@@ -115,7 +112,7 @@ export default function AdminOrders() {
 
             {loading && <p>Загрузка...</p>}
 
-            {error && (
+            {error && error !== "Объекты не найден" && (
                 <p style={{ color: "red" }}>{error}</p>
             )}
 

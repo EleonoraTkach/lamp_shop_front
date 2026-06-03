@@ -144,8 +144,8 @@ export default function AdminProduct() {
 
                     <button
                         className={styles.deleteBtn}
-                        onClick={() =>{
-                            dispatch(deleteProduct(id));
+                        onClick={async () => {
+                            await dispatch(deleteProduct(id));
                             navigate(-1);
                         }}
                     >

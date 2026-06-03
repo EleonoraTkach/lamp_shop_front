@@ -1,5 +1,3 @@
-// store/reducers/orderReducer.js
-
 import {
     ORDER_LOADING,
     ORDER_SUCCESS,

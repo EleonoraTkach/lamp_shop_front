@@ -122,7 +122,7 @@ export default function AdminCreateProduct() {
                         id="price"
                         name="price"
                         min="0.01"
-                        step="1"
+                        step="0.01"
                         value={formData.price}
                         onChange={handleChange}
                         placeholder="99.99"
